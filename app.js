@@ -2,6 +2,8 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const localDate = () => {const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+const makeId = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') ? globalThis.crypto.randomUUID() : `record-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const cloneValue = value => typeof globalThis.structuredClone === 'function' ? globalThis.structuredClone(value) : {...value,materials:(value.materials || []).map(material => ({...material}))};
 const steps = [
   {name:'回顾经历',question:'今天哪件事值得回顾？',hint:'先写一个具体片段：当时在做什么？你做了什么？后来发生了什么？不用一次写得很完整。',fields:[['experience','发生了什么？','textarea']]},
   {name:'发现优点',question:'这件事中，你做对了什么？',hint:'从你的一个具体行为开始。即使结果不完美，也可以看见过程中做得好的部分。',fields:[['strength','我做得好的地方','textarea'],['evidence','哪一个具体细节可以证明？','textarea']]},
@@ -69,7 +71,7 @@ function persist() {
     setSaveState('尚未保存：材料链接需要完整的 http:// 或 https:// 地址。输入内容仍在，请返回对应步骤修改。', true);
     return Promise.resolve(false);
   }
-  const snapshot = structuredClone(current), savedRevision = revision;
+  const snapshot = cloneValue(current), savedRevision = revision;
   snapshot.updatedAt = new Date().toISOString();
   setSaveState('正在保存，请稍候…');
   const task = saveQueue.then(async () => {
@@ -128,14 +130,17 @@ function renderHome() {
   historyRows.innerHTML = visible.length ? visible.map(record => `<button class="card record history-card" data-open="${record.id}" type="button"><span class="eyebrow">${escapeHTML(record.date)}</span><span class="badge">${record.status === 'draft' ? '草稿' : '已完成'}</span><p class="record-title">${escapeHTML(titleOf(record))}</p><p class="subtle snippet">${escapeHTML(record.action ? `小行动：${record.action} · ${record.followStatus}` : '小行动暂未填写，随时可以补充。')}</p></button>`).join('') : `<div class="footprints empty"><p>${filterDate ? '这一天还没有复盘记录。' : '从一件小事开始'}</p><p class="subtle">保存后的复盘会按日期留在这里，方便回看。</p></div>`;
 }
 function newRecord() {
-  return {id:crypto.randomUUID(),date:localDate(),title:'',...Object.fromEntries(fieldKeys.map(key => [key,''])),status:'draft',step:0,followStatus:'待尝试',effect:'',materials:[],updatedAt:new Date().toISOString()};
+  return {id:makeId(),date:localDate(),title:'',...Object.fromEntries(fieldKeys.map(key => [key,''])),status:'draft',step:0,followStatus:'待尝试',effect:'',materials:[],updatedAt:new Date().toISOString()};
 }
 function revokeURLs() {urls.forEach(url => URL.revokeObjectURL(url)); urls = [];}
 function openRecord(record, view = 'step') {
-  current = structuredClone(record); revision = 0; dirty = false;
+  current = cloneValue(record); revision = 0; dirty = false;
   stepIndex = current.step || 0; saveMessage = records.some(row => row.id === current.id) ? '已保存到当前浏览器' : '填写后会自动保存草稿'; saveError = false;
   if (view === 'follow') renderFollow(); else if (view === 'review') renderReview(); else renderStep();
-  if (!dialog.open) dialog.showModal();
+  if (!dialog.open) {
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open','');
+  }
   $$resize();
   const firstInput = $('textarea', dialog) || $('input', dialog); if (firstInput) firstInput.focus();
 }
@@ -223,7 +228,7 @@ dialog.addEventListener('change', async event => {
     $('#material-feedback').textContent = tooLarge ? `未添加：${tooLarge.name} 超过单个文件 10 MB 的限制。已输入的文字不受影响。` : '未添加：这些附件会使本条复盘超过 30 MB。请选择更小的文件，已输入文字不受影响。';
     event.target.value = ''; return;
   }
-  files.forEach(file => current.materials.push({id:crypto.randomUUID(),step:stepIndex,type:'file',name:file.name,blob:file,caption:''}));
+  files.forEach(file => current.materials.push({id:makeId(),step:stepIndex,type:'file',name:file.name,blob:file,caption:''}));
   event.target.value = ''; $('#material-feedback').textContent = '';
   if (files.length) {markChanged(); renderMaterials(true); await persist();}
 });
@@ -231,7 +236,7 @@ dialog.addEventListener('click', async event => {
   const button = event.target.closest('button'); if (!button || !current) return;
   if (closing) return;
   if (button.dataset.add) {
-    current.materials.push({id:crypto.randomUUID(),step:stepIndex,type:button.dataset.add,text:'',caption:''});
+    current.materials.push({id:makeId(),step:stepIndex,type:button.dataset.add,text:'',caption:''});
     markChanged(); renderMaterials(true); const fields = $('#material-list').querySelectorAll('input,textarea'); fields[fields.length-2]?.focus(); return;
   }
   if (button.dataset.remove) {
@@ -247,7 +252,7 @@ dialog.addEventListener('click', async event => {
   switch (button.dataset.do) {
     case 'files': $('#attachments').click(); break;
     case 'retry': await persist(); break;
-    case 'save-copy': current.id = crypto.randomUUID(); current.status = 'draft'; markChanged(); await closeSaved(); break;
+    case 'save-copy': current.id = makeId(); current.status = 'draft'; markChanged(); await closeSaved(); break;
     case 'exit': button.disabled = true; await closeSaved(); button.disabled = false; break;
     case 'next':
     case 'prev': {
@@ -275,7 +280,8 @@ document.addEventListener('click', event => {
   if (button.dataset.open) {const record = records.find(item => item.id === button.dataset.open); if(record) openRecord(record,record.status === 'draft' ? 'step' : 'review');}
   if (button.dataset.follow) {const record = records.find(item => item.id === button.dataset.follow); if(record) openRecord(record,'follow');}
 });
-$('#start').disabled = true;
+// Editing must remain available even when IndexedDB is blocked or slow to initialize.
+$('#start').disabled = false;
 $('#start').addEventListener('click', () => {const draft = sortedRecords().find(record => record.date === localDate() && record.status === 'draft'); openRecord(draft || newRecord());});
 (async () => {
   try {records = await getRecords(); records.forEach(record => savedVersions.set(record.id,record.updatedAt));}
@@ -283,5 +289,5 @@ $('#start').addEventListener('click', () => {const draft = sortedRecords().find(
     dbError = error?.message || '读取失败';
     const warning = document.createElement('p'); warning.className = 'home-error'; warning.setAttribute('role','alert'); warning.textContent = '当前浏览器无法读取本地记录。你仍可输入，但暂时不能保存；请保留页面并检查浏览器是否允许网站存储。'; $('.today').before(warning);
   }
-  renderHome(); $('#start').disabled = false;
+  renderHome();
 })();
