@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="成长手账：从一件小事开始，回顾经历、发现优点、理解困难、尝试改变。">
+  <title>成长手账 · 每日复盘</title>
+  <style>
+    :root{color-scheme:light;--paper:#F7F8F3;--ink:#173F35;--muted:#52675E;--blue:#2457D6;--line:#DEE5DC;--soft:#EEF2E9;--white:#FFF}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:4px}button{min-height:44px}p,h1,h2,h3{margin:0}p,span,h1,h2{overflow-wrap:anywhere}
+    .shell{max-width:720px;margin:auto;padding:28px 16px 30px}.brand{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--line)}.brand-name{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:2px}.mark{width:26px;height:26px;border:1.5px solid var(--ink);border-radius:5px;display:grid;place-items:center;font:16px Georgia,serif}.edition{font-size:14px;color:var(--muted)}header{padding:25px 0 24px}.date{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:10px}.date:before{content:"";width:6px;height:6px;background:var(--ink);border-radius:50%}h1{font-size:26px;line-height:1.45;font-weight:650;letter-spacing:-.5px}.intro{color:var(--muted);margin-top:8px;font-size:14px}
+    .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 3px 10px #173f3504}.today{position:relative;overflow:hidden;padding-top:23px}.today:before{content:"";position:absolute;left:20px;top:0;width:52px;height:3px;background:var(--blue)}.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}h2{font-size:20px;font-weight:650;line-height:1.5}.status{font-size:14px;border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--muted);white-space:nowrap}.description{color:var(--muted);margin-top:10px}.path{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0;margin:22px 0 24px;gap:6px}.path li{position:relative;display:flex;flex-direction:column;gap:8px;align-items:center;font-size:14px}.path li:not(:last-child):after{content:"";position:absolute;top:13px;left:calc(50% + 20px);width:calc(100% - 34px);height:1px;background:var(--line)}.number{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;font:14px Georgia,serif;background:var(--paper)}.primary{width:100%;border:0;background:var(--blue);color:white;border-radius:10px;padding:12px 16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:14px}.primary:hover{background:#1c46b0}.gentle{font-size:14px;text-align:center;color:var(--muted);margin-top:11px}.section{margin-top:24px}.section-heading{display:flex;align-items:center;gap:10px;margin-bottom:12px}.index{font:italic 17px Georgia,serif;color:var(--muted)}.action{border-left:3px solid #64846E;background:#F0F4EC;box-shadow:none}.eyebrow{font-size:14px;color:var(--muted);margin-bottom:7px}.action p:last-child{font-size:14px;color:var(--muted);margin-top:6px}.evidence{min-height:114px;display:flex;flex-direction:column;justify-content:center;background:repeating-linear-gradient(transparent 0,transparent 31px,#173f3505 31px,#173f3505 32px),white}.evidence p{max-width:32em}.subtle{color:var(--muted);font-size:14px;margin-top:6px}.footprints{border-top:1px solid var(--line);padding:18px 4px 4px;display:flex;gap:14px;align-items:flex-start}.trail{width:10px;flex-shrink:0;height:10px;border:1px solid #738A7B;border-radius:50%;margin-top:9px;position:relative}.trail:after{content:"";position:absolute;top:14px;left:3px;width:1px;height:28px;background:var(--line)}footer{border-top:1px solid var(--line);margin-top:26px;padding-top:16px;text-align:center;color:var(--muted);font-size:14px}.preview-label{display:inline-block;margin-bottom:5px;border:1px solid var(--line);border-radius:4px;padding:0 7px}
+    dialog{border:1px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);width:calc(100% - 32px);max-width:550px;padding:24px;max-height:85dvh;overflow:auto}dialog::backdrop{background:#102c2666}dialog h2{font-size:24px;margin:16px 0 10px}dialog .prompt{background:white;border:1px solid var(--line);border-radius:12px;padding:18px;margin:20px 0}dialog ul{padding-left:22px;margin-bottom:0}dialog li+li{margin-top:6px}.close{border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);padding:8px 12px}.dialog-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.dialog-note{font-size:14px;color:var(--muted)}
+    @media(min-width:600px){.shell{padding-top:36px}.card{padding:24px}.today{padding-top:26px}.today:before{left:24px}.path{margin:24px 0}.brand{padding-bottom:24px}header{padding:28px 0}.today .primary{max-width:360px;margin:auto}.section{margin-top:24px}}
+    @media(prefers-reduced-motion:no-preference){button{transition:background .15s ease}}
+  </style>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <main class="shell">
+    <div class="brand"><div class="brand-name"><span class="mark" aria-hidden="true">/</span>成长手账</div><span class="edition">每日 · 一点发现</span></div>
+    <header><p class="date" id="today-date">今日</p><h1>从今天的一件小事开始。</h1><p class="intro">慢慢理清经历，也看见自己做得好的地方。</p></header>
+    <section class="card today" aria-labelledby="today-title">
+      <div class="card-top"><h2 id="today-title">今日复盘</h2><span class="status">未开始</span></div>
+      <p class="description">不必整理一整天，选一件你想聊聊的事就好。</p>
+      <ol class="path" aria-label="复盘的四个步骤"><li><span class="number">1</span>回顾经历</li><li><span class="number">2</span>发现优点</li><li><span class="number">3</span>理解困难</li><li><span class="number">4</span>确定行动</li></ol>
+      <button class="primary" id="start" type="button" aria-haspopup="dialog">开始今日复盘 <span aria-hidden="true">↗</span></button>
+      <p class="gentle">一次想一步，暂时没有答案也没关系。</p>
+    </section>
+    <section class="section" aria-labelledby="action-title"><div class="section-heading"><span class="index" aria-hidden="true">01</span><h2 id="action-title">上次的小行动</h2></div><div class="card action"><p class="eyebrow">给改变留一点空间</p><p>完成复盘后，你的小行动会出现在这里。</p><p>试过以后，再回来记下效果。</p></div></section>
+    <section class="section" aria-labelledby="strength-title"><div class="section-heading"><span class="index" aria-hidden="true">02</span><h2 id="strength-title">我发现的优点</h2></div><div class="card evidence"><p>记录一个你做得好的细节，<br>它会出现在这里。</p><p class="subtle">每一个优点，都有一件小事作为依据。</p></div></section>
+    <section class="section" aria-labelledby="history-title"><div class="section-heading"><span class="index" aria-hidden="true">03</span><h2 id="history-title">复盘足迹</h2></div><div class="footprints"><span class="trail" aria-hidden="true"></span><div><p>从一件小事开始</p><p class="subtle">保存后的复盘会按日期留在这里，方便回看。</p></div></div></section>
+    <footer><p>只在当前浏览器保存 · 不需要连续打卡</p><details><summary>保存与附件说明</summary><p>文字和附件使用 IndexedDB 保存在此浏览器的网站数据中，不会上传。请使用同一个浏览器和网址回看；清除网站数据、更换浏览器或使用无痕模式可能导致记录丢失。单个文件最多 10 MB，每条复盘附件合计最多 30 MB。常见图片可直接预览，其他文件可下载；链接只保存地址，不会抓取网页内容。总容量由浏览器决定。请等到显示“已保存”再关闭页面。</p></details></footer>
+  </main>
+  <div id="notice" role="status" aria-live="polite"></div>
+  <dialog id="first-step" aria-labelledby="step-title"></dialog>
+  <script src="/app.js" defer></script>
+</body>
+</html>
